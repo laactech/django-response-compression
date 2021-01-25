@@ -1,0 +1,111 @@
+[tool.poetry]
+name = "response_compression"
+version = "1.0.0"
+authors = ["Steven Pate <steven@laac.dev>"]
+description = "Combined Brotli and GZip compression for Django HTTP responses"
+license = "BSD-3-Clause"
+readme = "README.md"
+repository = "https://github.com/laactech/django-response-compression"
+documentation = "https://github.com/laactech/django-response-compression"
+keywords = [
+    "python",
+    "http",
+    "django",
+    "brotli",
+    "gzip",
+    "compress",
+    "compression"
+]
+classifiers = [
+    "Natural Language :: English",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Environment :: Web Environment",
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Django :: 2.2",
+    "Framework :: Django :: 3.0",
+    "Framework :: Django :: 3.1",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Topic :: Internet :: WWW/HTTP",
+]
+
+
+[tool.poetry.dependencies]
+python = "^3.6"
+Brotli = "^1.0.9"
+Django = ">= 2.2, < 4.0"
+
+[tool.poetry.dev-dependencies]
+
+[tool.isort]
+profile = "black"
+line_length = 120
+
+[tool.black]
+line-length = 120
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  # The following are specific to Black, you probably don't want those.
+  | blib2to3
+  | tests/data
+  | profiling
+)/
+'''
+
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+skipsdist = True
+envlist =
+       {py36,py37,py38,py39}-django{22,30,31}
+       lint
+
+[tox:.package]
+# note tox will use the same python version as under what tox is installed to package
+# so unless this is python 3 you can require a given python version for the packaging
+# environment via the basepython key
+basepython = python3
+
+[travis:env]
+DJANGO =
+    2.2: django22
+    3.0: django30
+    3.1: django31
+
+[testenv]
+recreate = true
+whitelist_externals = poetry
+install_command = poetry add -D {packages}
+commands =
+    poetry install -vvv
+    poetry add asgiref
+    poetry run pytest --cov=response_compression
+envdir = {toxworkdir}/venvs/{envname}
+deps =
+        django22: django>=2.2,<3.0
+        django30: django>=3.0,<3.1
+        django31: django>=3.1,<3.2
+
+[testenv:lint]
+commands = pre-commit run -a
+"""
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

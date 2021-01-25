@@ -1,0 +1,5 @@
+from django.utils.decorators import decorator_from_middleware
+
+from .middleware import ResponseCompressionMiddleware
+
+compress_response = decorator_from_middleware(ResponseCompressionMiddleware)
